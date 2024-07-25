@@ -4,6 +4,12 @@ module ietf-quic-server {
     "urn:ietf:params:xml:ns:yang:ietf-quic-server";
   prefix quicc;
 
+  import ietf-netconf-server {
+    prefix ncs;
+    reference
+      "RFC DDDD: NETCONF Client and Server Models";
+  }
+
   import ietf-tls-server {
     prefix tlss;
     reference
@@ -62,6 +68,13 @@ module ietf-quic-server {
       "RFC AAAA: YANG Groupings for QUIC Clients and QUIC Servers";
   }
 
+  // Features
+
+  feature quic-listen {
+    description
+      "NETCONF over QUIC";
+  }
+
   // Groupings
 
   grouping quic-server-grouping {
@@ -79,4 +92,17 @@ module ietf-quic-server {
     }
     uses udps:udp-server-grouping;
   }
+
+  // Augments
+
+  augment "/ncs:netconf-server/ncs:listen/ncs:endpoints/ncs:endpoint" +
+          "/ncs:transport" {
+    case quic {
+      if-feature "quic-listen";
+      container quic {
+        uses quics:quic-server-grouping;
+      }
+    }
+  }
+
 }
